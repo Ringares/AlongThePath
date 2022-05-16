@@ -1,0 +1,12 @@
+# Import cache
+.import/
+*.translation
+
+# Binaries
+bin/
+build/
+lib/
+
+export_presets.cfg
+.mono/
+.DS_Store
