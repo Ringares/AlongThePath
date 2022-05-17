@@ -1,0 +1,15 @@
+[gd_scene load_steps=4 format=2]
+
+[ext_resource path="res://Resources/BDestroyAnim.tscn" type="PackedScene" id=1]
+[ext_resource path="res://Asserts/Environment/Props/jelly/block_attack_jelly.png" type="Texture" id=2]
+[ext_resource path="res://Scenes/MainScenes/B_base.gd" type="Script" id=3]
+
+[node name="B_fire" type="Node2D"]
+script = ExtResource( 3 )
+type = "attack"
+
+[node name="Sprite" type="Sprite" parent="."]
+scale = Vector2( 0.5, 0.5 )
+texture = ExtResource( 2 )
+
+[node name="AnimationPlayer" parent="." instance=ExtResource( 1 )]

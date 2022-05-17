@@ -15,13 +15,13 @@ func _ready():
 	anim_player = get_node("AnimationPlayer")
 	add_child(tween)
 	
-func _unhandled_input(event):
-	if Input.is_action_pressed("ui_accept"):
-#		tween_pos_to(Vector2.RIGHT)
-		if anim_player.is_playing():
-			anim_player.stop()
-		else:
-			shake()
+#func _unhandled_input(event):
+#	if Input.is_action_pressed("ui_accept"):
+##		tween_pos_to(Vector2.RIGHT)
+#		if anim_player.is_playing():
+#			anim_player.stop()
+#		else:
+#			shake()
 
 func tween_pos_to(pos: Vector2):
 	tween.interpolate_property(self, "position",

@@ -2,15 +2,15 @@
 
 importer="texture"
 type="StreamTexture"
-path="res://.import/block_fire_jelly.png-6127cb8b80227a5acdd1ca7178ff5e93.stex"
+path="res://.import/block_attack_jelly.png-888b3bb4d65ca9c03cf3f4f735b1277b.stex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://Asserts/Environment/Props/jelly/block_fire_jelly.png"
-dest_files=[ "res://.import/block_fire_jelly.png-6127cb8b80227a5acdd1ca7178ff5e93.stex" ]
+source_file="res://Asserts/Environment/Props/jelly/block_attack_jelly.png"
+dest_files=[ "res://.import/block_attack_jelly.png-888b3bb4d65ca9c03cf3f4f735b1277b.stex" ]
 
 [params]
 

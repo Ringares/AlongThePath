@@ -1,0 +1,38 @@
+[gd_scene format=2]
+
+[node name="Control" type="VBoxContainer"]
+anchor_right = 1.0
+anchor_bottom = 1.0
+
+[node name="HBoxContainer" type="HBoxContainer" parent="."]
+margin_right = 640.0
+margin_bottom = 510.0
+size_flags_vertical = 3
+
+[node name="Button" type="Button" parent="HBoxContainer"]
+margin_right = 318.0
+margin_bottom = 510.0
+size_flags_horizontal = 3
+size_flags_vertical = 3
+
+[node name="Button2" type="Button" parent="HBoxContainer"]
+margin_left = 322.0
+margin_right = 640.0
+margin_bottom = 510.0
+size_flags_horizontal = 3
+size_flags_vertical = 3
+
+[node name="HBoxContainer2" type="HBoxContainer" parent="."]
+margin_top = 514.0
+margin_right = 640.0
+margin_bottom = 1024.0
+size_flags_vertical = 3
+
+[node name="Button" type="Button" parent="HBoxContainer2"]
+margin_right = 12.0
+margin_bottom = 510.0
+
+[node name="Button2" type="Button" parent="HBoxContainer2"]
+margin_left = 16.0
+margin_right = 28.0
+margin_bottom = 510.0

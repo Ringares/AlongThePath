@@ -39,7 +39,7 @@ func _process(_delta):
 	for prop in props:
 		prop.set_label()
 		
-func add_property(object, property, display):
+func add_property(object, property, display=''):
 	var label = Label.new()
 	label.set("custom_fonts/font", load("res://Resources/Fonts/debug_font.tres"))
 	$MarginContainer/VBoxContainer.add_child(label)

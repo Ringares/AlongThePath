@@ -2,15 +2,15 @@
 
 importer="texture"
 type="StreamTexture"
-path="res://.import/block_ice_jelly.png-48016e2cdc18d7b402eb4ab7e2fd6145.stex"
+path="res://.import/block_field_jelly.png-fcdd50bb674693b72d9fa3cacc505610.stex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://Asserts/Environment/Props/jelly/block_ice_jelly.png"
-dest_files=[ "res://.import/block_ice_jelly.png-48016e2cdc18d7b402eb4ab7e2fd6145.stex" ]
+source_file="res://Asserts/Environment/Props/jelly/block_field_jelly.png"
+dest_files=[ "res://.import/block_field_jelly.png-fcdd50bb674693b72d9fa3cacc505610.stex" ]
 
 [params]
 

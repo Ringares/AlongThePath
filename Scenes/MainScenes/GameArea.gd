@@ -1,9 +1,12 @@
 extends Node2D
 
-signal debug_info(info)
+
 signal delete_blocks
 signal drop_blocks(blocks)
 signal fill_blocks
+signal collect_block(type)  # 某个种类被消除时
+
+
 
 # game setting
 var ROW = 6
@@ -13,30 +16,37 @@ var height = 0
 
 var block_list = []
 var blocks = [
-	preload("res://Scenes/MainScenes/B_fire.tscn"),
-	preload("res://Scenes/MainScenes/B_flash.tscn"),
-	preload("res://Scenes/MainScenes/B_forest.tscn"),
-	preload("res://Scenes/MainScenes/B_water.tscn"),
-#	preload("res://Scenes/MainScenes/B_earth.tscn"),
+	preload("res://Scenes/MainScenes/B_scan.tscn"),
+	preload("res://Scenes/MainScenes/B_energy.tscn"),
+	preload("res://Scenes/MainScenes/B_shield.tscn"),
+	preload("res://Scenes/MainScenes/B_attack.tscn"),
+	preload("res://Scenes/MainScenes/B_field.tscn"),
 ]
 
 # controling
 var is_touching = false
-var is_active = true
 var press_pos = Vector2.ZERO
 var release_pos = Vector2.ZERO
 var move_direction = Vector2.ZERO
 
+# game state
+const IDEL = 'IDEL'
+const RUNNING = 'RUNNING'
+var game_state = IDEL
+var enable_auto = false
+
 # game info
-var combo_cnt = 0
+
 
 func _ready():
+	MatchControl.ROW = ROW
+	MatchControl.COL = COL
+	
 	connect("delete_blocks", self, "_on_block_destroy")
 	connect("drop_blocks", self, "_on_block_drop")
 	connect("fill_blocks", self, "_on_block_fill")
 
-	DebugDisplay.add_property(self, 'combo_cnt', '')
-	DebugDisplay.add_property(self, 'is_active', '')
+	DebugDisplay.add_property(self, 'game_state', '')
 	
 	randomize()
 	var width_height : Vector2 = get_viewport_rect().size
@@ -51,45 +61,57 @@ func _ready():
 	# init 2d array
 	for i in range(COL):
 		block_list.append([])
-		for j in range(ROW):
+		for _j in range(ROW):
 			block_list[i].append(null)
 	init_game()
 	
 func _process(delta):
-	if is_active:
-		if Input.is_action_just_pressed("ui_touch"):
-			is_touching = true
-			press_pos = get_global_mouse_position()
-			
-			var press_index = pos2index(press_pos)
-			print("==>\n",press_index)
-			if press_index != null and get_block(press_index) != null:
-				print(index2pos(pos2index(press_pos)))
-				print(get_block(press_index).desc())
-				is_match_at_index(pos2index(press_pos), 'fire')
-				
-		if Input.is_action_just_released("ui_touch"):
-			is_touching = false
-			
-			if move_direction != Vector2.ZERO:
-				is_active = false
-				var index1 = pos2index(press_pos)
-				var index2 = index1 + move_direction
-				if is_valid_index(index2):
-					exchange_block(index1, index2)
-					# check_match
-					var is_matched1 = match_blocks(get_block(index1))
-					var is_matched2 = match_blocks(get_block(index2))
-					if not (is_matched1 or is_matched2):
-						yield(get_tree().create_timer(0.35), "timeout")
-						exchange_block(index1, index2)
-						is_active = true
-					else:
-						emit_signal("delete_blocks")
-					
-		
+	if game_state == IDEL:
+		game_state = RUNNING
+		if enable_auto:
+			var matches = MatchControl.search_matches(block_list)
+			if matches.size() > 0:
+				take_one_move(matches.best_match.index1, matches.best_match.index2)
+			else:
+				print("!!! No Matches")
+		else:
+			var unhandled = process_input(delta)
+			if unhandled:
+				game_state = IDEL
+			else:
+				pass
+	elif game_state == RUNNING:
+		pass
+
+func process_input(_delta) -> bool:
+	"""
+	return unhandled flag
+	"""
+	if Input.is_action_just_pressed("ui_accept"):
+		#print(MatchControl.search_matches(block_list))
+		enable_auto = !enable_auto
 	
-func _physics_process(delta):
+	if Input.is_action_just_pressed("ui_touch"):
+		is_touching = true
+		press_pos = get_global_mouse_position()
+		
+		var press_index = pos2index(press_pos)
+		print("==>\n",press_index)
+		if press_index != null and get_block(press_index) != null:
+			print(index2pos(pos2index(press_pos)))
+			print(get_block(press_index).desc())
+			
+	if Input.is_action_just_released("ui_touch"):
+		is_touching = false
+		
+		if move_direction != Vector2.ZERO:
+			var index1 = pos2index(press_pos)
+			var index2 = index1 + move_direction
+			if is_valid_index(index2):
+				return take_one_move(index1, index2)
+	return true
+					
+func _physics_process(_delta):
 	var mouse_pos = get_global_mouse_position()
 	if is_touching and pos2index(mouse_pos) != pos2index(press_pos):
 		move_direction = ControlUtils.get_move_direction(press_pos, mouse_pos)
@@ -104,14 +126,27 @@ func init_game():
 			var new_block
 			while is_matched:
 				new_block = blocks[randi() % len(blocks)].instance()
-				var match_res = is_match_at_index(Vector2(i, j), new_block.type)
+				var match_res = MatchControl.is_match_at_index(Vector2(i, j), new_block.type, block_list)
 				is_matched = len(match_res[0]) >= 2 or len(match_res[1]) >= 2
 				
 			block_list[i][j] = new_block
 			$BlockContainer.add_child(new_block)
 			new_block.b_index = Vector2(i, j)
 			new_block.position = index2pos(new_block.b_index)
-	
+
+func take_one_move(index1, index2):
+	exchange_block(index1, index2)
+	# check_match
+	var is_matched1 = match_blocks(get_block(index1))
+	var is_matched2 = match_blocks(get_block(index2))
+	if not (is_matched1 or is_matched2):
+		yield(get_tree().create_timer(0.35), "timeout")
+		exchange_block(index1, index2)
+	else:
+		emit_signal("delete_blocks")
+		return false
+	return true
+
 func exchange_block(index1:Vector2, index2:Vector2):
 	var block1 = block_list[index1.x][index1.y]
 	var block2 = block_list[index2.x][index2.y]
@@ -136,7 +171,7 @@ func match_blocks(block):
 	mask del and drop
 	"""
 	var is_match = false
-	var match_res = is_match_at_index(block.b_index, block.type)
+	var match_res = MatchControl.is_match_at_index(block.b_index, block.type, block_list)
 	var row_matched = match_res[0]
 	var col_matched = match_res[1]
 	if len(row_matched) >= 2 :
@@ -151,62 +186,7 @@ func match_blocks(block):
 		for b in col_matched:
 			b.state = 'del'
 	return is_match
-
-func fill_blank(index: Vector2):
-	pass
 	
-func is_match_at_index(index: Vector2, type: String):
-	"""
-	find matches in row and col
-	return [row_matched, col_matched]
-	"""
-	var row_matched = []
-	var col_matched = []
-	
-	#iter to left
-	var t = index.y - 1
-	while t >= 0:
-		var block = block_list[index.x][t]
-		if block != null and block.type == type:
-			col_matched.append(block)
-			t -= 1
-		else:
-			break
-#
-	#iter to right
-	t = index.y + 1
-	while t <= COL -1:
-		var block = block_list[index.x][t]
-		if block != null and block.type == type:
-			col_matched.append(block)
-			t += 1
-		else:
-			break
-
-	#iter to down
-	t = index.x - 1
-	while t >= 0:
-		var block = block_list[t][index.y]
-		if block != null and block.type == type:
-			row_matched.append(block)
-			t -= 1
-		else:
-			break
-
-	#iter to up
-	t = index.x + 1
-	while t <= ROW -1:
-		var block = block_list[t][index.y]
-		if block != null and block.type == type:
-			row_matched.append(block)
-			t += 1
-		else:
-			break
-
-#	print('row_matched ', row_matched)
-#	print('col_matched ', col_matched)
-	return [row_matched, col_matched]
-		
 	
 func index2pos(index: Vector2):
 	var zero_pos = Vector2(width/2-64*COL/2, height/2-64*ROW/2)
@@ -251,18 +231,17 @@ func _on_block_destroy():
 							drop_blocks.append(above_block)
 	if len(delete_blocks) == 0:
 		return
-	else:
-		combo_cnt += 1
+
 	
 	yield(get_tree().create_timer(0.2), "timeout")
 	for b in delete_blocks:
+		emit_signal("collect_block", b.type)
 		b.queue_free()
 		block_list[b.b_index.x][b.b_index.y] = null
 	
 	emit_signal("drop_blocks", drop_blocks)
 	
 
-	
 func _on_block_drop(drop_blocks):
 	yield(get_tree().create_timer(0.2), "timeout")
 	for i in range(drop_blocks.size()-1, -1, -1):
@@ -299,11 +278,3 @@ func _on_block_fill():
 				is_match = match_blocks(new_block) or is_match
 	if is_match:
 		emit_signal("delete_blocks")
-	else:
-		combo_cnt = 0
-		is_active = true
-		
-	
-	
-	
-

@@ -2,15 +2,15 @@
 
 importer="texture"
 type="StreamTexture"
-path="res://.import/block_flash_jelly.png-9efb08dd376f541a914c1ddfefddc7fe.stex"
+path="res://.import/block_energy_jelly.png-0c5a73c562759b9e2ae27ebc44f638cc.stex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://Asserts/Environment/Props/jelly/block_flash_jelly.png"
-dest_files=[ "res://.import/block_flash_jelly.png-9efb08dd376f541a914c1ddfefddc7fe.stex" ]
+source_file="res://Asserts/Environment/Props/jelly/block_energy_jelly.png"
+dest_files=[ "res://.import/block_energy_jelly.png-0c5a73c562759b9e2ae27ebc44f638cc.stex" ]
 
 [params]
 
