@@ -1,5 +1,5 @@
 extends Control
-
+class_name BattleIndicator
 
 var type_cnts = {
 		'attack':0,
@@ -20,19 +20,17 @@ func _ready():
 	reset_info()
 	
 func reset_info():
-	for name in type_cnts:
-		type_cnts[name] = 0
 	for b in container.get_children():
 		b.visible = false
 	
-func update_info(type):
-	if type in type_cnts.keys():
-		type_cnts[type] += 1
-		
-		for name in type_cnts:
-			if type_cnts[name] > 0:
-				print("refresh_display ", name, type_cnts[name])
-				container.get_node(name).visible=true
-				container.get_node(name).get_node("Label").text = str(type_cnts[name])
-			else:
-				container.get_node(name).visible=false
+func update_info(type_cnts):
+	for type in type_cnts.keys():
+		if type_cnts[type] > 0:
+			container.get_node(type).visible=true
+			container.get_node(type).get_node("Label").text = str(type_cnts[type])
+		else:
+			container.get_node(type).visible=false
+			
+
+func get_golbal_pos():
+	return container.rect_global_position + container.rect_size / 2

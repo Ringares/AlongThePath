@@ -1,0 +1,14 @@
+[gd_scene load_steps=4 format=2]
+
+[ext_resource path="res://Scenes/SkillScene/Skill.tscn" type="PackedScene" id=1]
+[ext_resource path="res://Scenes/SkillScene/BombSkill.gd" type="Script" id=2]
+
+[sub_resource type="StreamTexture" id=1]
+load_path = "res://.import/skill_icons33.png-5013ee45b1432453afccb26dbacfb03d.stex"
+
+[node name="BombSkill" instance=ExtResource( 1 )]
+script = ExtResource( 2 )
+icon = SubResource( 1 )
+skill_name = "Bomb"
+cooldown = 3
+cost = 3

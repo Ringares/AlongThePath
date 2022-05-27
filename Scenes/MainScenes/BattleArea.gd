@@ -1,16 +1,13 @@
 extends Node2D
-
+class_name BattleArea
 
 signal delete_blocks
 signal drop_blocks(blocks)
 signal fill_blocks
-signal collect_block(type)  # 某个种类被消除时
-
-
 
 # game setting
-var ROW = 6
-var COL = 6
+export var ROW = 6
+export var COL = 6
 var width = 0
 var height = 0
 
@@ -23,19 +20,25 @@ var blocks = [
 	preload("res://Scenes/MainScenes/B_field.tscn"),
 ]
 
+
 # controling
 var is_touching = false
 var press_pos = Vector2.ZERO
 var release_pos = Vector2.ZERO
 var move_direction = Vector2.ZERO
 
+
 # game state
 const IDEL = 'IDEL'
 const RUNNING = 'RUNNING'
+const SKILL = 'SKILL'
 var game_state = IDEL
 var enable_auto = false
 
+
 # game info
+var panel_pos = Vector2.ZERO
+var panel_size = Vector2.ZERO
 
 
 func _ready():
@@ -58,14 +61,23 @@ func _ready():
 	$BG.rect_position = Vector2(width/2 - 64*COL/2 - BG_margin, height/2 - 64*ROW/2 - BG_margin)
 	$BG.rect_size = Vector2(64*COL+2*BG_margin, 64*ROW+2*BG_margin)
 	
+	panel_pos = Vector2(width/2 - 64*COL/2, height/2 - 64*ROW/2)
+	panel_size = Vector2(64*COL, 64*ROW)
+	
+	
 	# init 2d array
 	for i in range(COL):
 		block_list.append([])
 		for _j in range(ROW):
 			block_list[i].append(null)
 	init_game()
-	
+
+
 func _process(delta):
+	if Input.is_action_just_pressed("ui_accept"):
+		#print(MatchControl.search_matches(block_list))
+		enable_auto = !enable_auto
+	
 	if game_state == IDEL:
 		game_state = RUNNING
 		if enable_auto:
@@ -74,23 +86,31 @@ func _process(delta):
 				take_one_move(matches.best_match.index1, matches.best_match.index2)
 			else:
 				print("!!! No Matches")
+				game_state = IDEL
 		else:
-			var unhandled = process_input(delta)
+			var unhandled = process_input_move(delta)
 			if unhandled:
 				game_state = IDEL
 			else:
 				pass
+				
+	# 技能激活, 选择目标
+	elif game_state == SKILL:
+		var unhandled = process_input_skill(delta)
+		if unhandled:
+			game_state = IDEL
+		else:
+			pass
+			
+			
 	elif game_state == RUNNING:
 		pass
 
-func process_input(_delta) -> bool:
+
+func process_input_move(_delta) -> bool:
 	"""
 	return unhandled flag
 	"""
-	if Input.is_action_just_pressed("ui_accept"):
-		#print(MatchControl.search_matches(block_list))
-		enable_auto = !enable_auto
-	
 	if Input.is_action_just_pressed("ui_touch"):
 		is_touching = true
 		press_pos = get_global_mouse_position()
@@ -104,20 +124,28 @@ func process_input(_delta) -> bool:
 	if Input.is_action_just_released("ui_touch"):
 		is_touching = false
 		
-		if move_direction != Vector2.ZERO:
+		if move_direction != Vector2.ZERO and pos2index(press_pos) != null:
 			var index1 = pos2index(press_pos)
 			var index2 = index1 + move_direction
 			if is_valid_index(index2):
 				return take_one_move(index1, index2)
 	return true
-					
+
+
+func process_input_skill(_delta) -> bool:
+	if Input.is_action_just_pressed("ui_touch"):
+		# 选定目标, 开始技能
+		GameEvent.emit_signal("skill_execute")
+	return true
+
+
 func _physics_process(_delta):
 	var mouse_pos = get_global_mouse_position()
 	if is_touching and pos2index(mouse_pos) != pos2index(press_pos):
-		move_direction = ControlUtils.get_move_direction(press_pos, mouse_pos)
+		move_direction = get_move_direction(press_pos, mouse_pos)
 	else:
 		move_direction = Vector2.ZERO
-		
+
 
 func init_game():
 	for i in range(COL):
@@ -134,6 +162,7 @@ func init_game():
 			new_block.b_index = Vector2(i, j)
 			new_block.position = index2pos(new_block.b_index)
 
+
 func take_one_move(index1, index2):
 	exchange_block(index1, index2)
 	# check_match
@@ -147,12 +176,14 @@ func take_one_move(index1, index2):
 		return false
 	return true
 
+
 func exchange_block(index1:Vector2, index2:Vector2):
 	var block1 = block_list[index1.x][index1.y]
 	var block2 = block_list[index2.x][index2.y]
 	var direction = block2.b_index - block1.b_index
 	move_block(block1, direction)
 	move_block(block2, -direction)
+
 
 func move_block(block, direction:Vector2, step=1, set_null=false):
 	var pre_index = block.b_index
@@ -165,6 +196,7 @@ func move_block(block, direction:Vector2, step=1, set_null=false):
 	block.b_index = post_index
 	if set_null:
 		block_list[pre_index.x][pre_index.y] = null
+
 
 func match_blocks(block):
 	"""
@@ -191,7 +223,8 @@ func match_blocks(block):
 func index2pos(index: Vector2):
 	var zero_pos = Vector2(width/2-64*COL/2, height/2-64*ROW/2)
 	return Vector2(zero_pos.x + 64*index.x, zero_pos.y + 64*index.y)
-	
+
+
 func pos2index(pos: Vector2):
 	var zero_pos = Vector2(width/2-64*COL/2, height/2-64*ROW/2)
 	var rel_x = pos.x - zero_pos.x
@@ -199,17 +232,32 @@ func pos2index(pos: Vector2):
 	
 	var index = Vector2(floor(rel_x/64), floor(rel_y/64))
 	return index if is_valid_index(index) else null
-	
+
+
 func is_valid_index(index:Vector2):
 	if index.x < 0 or index.x > COL-1:
 		return false
 	if index.y < 0 or index.y > ROW-1:
 		return false
 	return true
-	
+
+
 func get_block(index: Vector2):
 	return block_list[index.x][index.y]
-	
+
+
+func get_move_direction(from:Vector2, to:Vector2):
+	var ang = Vector2.RIGHT.angle_to(to-from)
+	if -PI/4 < ang and ang <= PI/4:
+		return Vector2.RIGHT
+	if PI/4 < ang and ang <= 3*PI/4:
+		return Vector2.DOWN
+	if 3*PI/4 < ang or ang <= -3*PI/4:
+		return Vector2.LEFT
+	if -3*PI/4 < ang and ang <= -PI/4:
+		return Vector2.UP
+
+
 func _on_block_destroy():
 	var delete_blocks = []
 	var drop_blocks = []
@@ -231,22 +279,26 @@ func _on_block_destroy():
 							drop_blocks.append(above_block)
 	if len(delete_blocks) == 0:
 		return
-
 	
 	yield(get_tree().create_timer(0.2), "timeout")
+	var deleted_type_cnt = {}
 	for b in delete_blocks:
-		emit_signal("collect_block", b.type)
+		deleted_type_cnt[b.type] = deleted_type_cnt.get(b.type, 0) + 1
 		b.queue_free()
 		block_list[b.b_index.x][b.b_index.y] = null
+	for k in deleted_type_cnt.keys():
+		GameEvent.emit_signal("collect_block", k, deleted_type_cnt[k])
+		
 	
+	AudioManager.emit_signal("play_effect_delete_block")
 	emit_signal("drop_blocks", drop_blocks)
-	
+
 
 func _on_block_drop(drop_blocks):
 	yield(get_tree().create_timer(0.2), "timeout")
 	for i in range(drop_blocks.size()-1, -1, -1):
 		var b = drop_blocks[i]
-		print('drop ', b.desc())
+#		print('drop ', b.desc())
 		move_block(b, Vector2.DOWN, b.drop_step, true)
 		b.state = 'normal'
 		b.drop_step = 0
@@ -259,13 +311,15 @@ func _on_block_drop(drop_blocks):
 		# fill
 		yield(get_tree().create_timer(0.2), "timeout")
 		emit_signal("fill_blocks")
-	
+
+
 func _on_block_fill():
+	AudioManager.emit_signal("play_effect_drop_block")
 	var is_match = false
 	for i in range(COL):
 		for j in range(ROW-1, -1, -1):
 			if block_list[i][j] == null:
-				print('fill ', i, j)
+#				print('fill ', i, j)
 				var new_block = blocks[randi() % len(blocks)].instance()
 					
 				block_list[i][j] = new_block

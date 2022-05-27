@@ -1,0 +1,14 @@
+[gd_scene load_steps=4 format=2]
+
+[ext_resource path="res://Scenes/SkillScene/Skill.tscn" type="PackedScene" id=1]
+[ext_resource path="res://Scenes/SkillScene/ShieldSkill.gd" type="Script" id=2]
+
+[sub_resource type="StreamTexture" id=1]
+load_path = "res://.import/skill_icons22.png-4cd49f7048bafa7815d53a517bea6129.stex"
+
+[node name="ShieldSkill" instance=ExtResource( 1 )]
+script = ExtResource( 2 )
+icon = SubResource( 1 )
+skill_name = "Shield"
+cooldown = 3
+cost = 3

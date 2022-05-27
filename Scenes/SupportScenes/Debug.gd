@@ -9,7 +9,6 @@ extends Node2D
 # Called when the node enters the scene tree for the first time.
 func _ready():
 	var p = self.get_parent()
-	p.connect("debug_info", self, "on_debug_info")
 
 
 func _physics_process(delta):

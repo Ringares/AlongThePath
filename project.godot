@@ -14,41 +14,85 @@ _global_script_classes=[ {
 "language": "GDScript",
 "path": "res://Scenes/MainScenes/B_base.gd"
 }, {
+"base": "Node2D",
+"class": "BattleArea",
+"language": "GDScript",
+"path": "res://Scenes/MainScenes/BattleArea.gd"
+}, {
+"base": "Control",
+"class": "BattleHUD",
+"language": "GDScript",
+"path": "res://Scenes/UIScenes/BattleHUD.gd"
+}, {
+"base": "Control",
+"class": "BattleIndicator",
+"language": "GDScript",
+"path": "res://Scenes/UIScenes/CollectionIndicator.gd"
+}, {
+"base": "Node",
+"class": "BattleManager",
+"language": "GDScript",
+"path": "res://Scenes/MainScenes/BattleManager.gd"
+}, {
 "base": "Object",
 "class": "Charactor",
 "language": "GDScript",
 "path": "res://Scenes/SupportScenes/Charactor.gd"
 }, {
+"base": "Control",
+"class": "CharactorUI",
+"language": "GDScript",
+"path": "res://Scenes/UIScenes/CharactorUI.gd"
+}, {
 "base": "EditorVCSInterface",
 "class": "GitAPI",
 "language": "NativeScript",
 "path": "res://addons/godot-git-plugin/git_api.gdns"
+}, {
+"base": "TextureButton",
+"class": "Skill",
+"language": "GDScript",
+"path": "res://Scenes/SkillScene/Skill.gd"
+}, {
+"base": "ColorRect",
+"class": "TurnIndicator",
+"language": "GDScript",
+"path": "res://Scenes/UIScenes/TurnIndicator.gd"
 } ]
 _global_script_class_icons={
 "BBase": "",
+"BattleArea": "",
+"BattleHUD": "",
+"BattleIndicator": "",
+"BattleManager": "",
 "Charactor": "",
-"GitAPI": ""
+"CharactorUI": "",
+"GitAPI": "",
+"Skill": "",
+"TurnIndicator": ""
 }
 
 [application]
 
 config/name="Match3"
 run/main_scene="res://Scenes/MainScenes/Main.tscn"
-config/icon="res://icon.png"
+config/icon="res://Asserts/Icons/icon_120.png"
 
 [autoload]
 
-DebugDisplay="*res://Singletons/DebugDisplay.tscn"
 ControlUtils="*res://Singletons/ControlUtils.gd"
 MatchControl="*res://Singletons/MatchControl.gd"
 GameData="*res://Singletons/GameData.gd"
+GameEvent="*res://Singletons/GameEvent.gd"
+AudioManager="*res://Singletons/AudioManager.gd"
+DebugDisplay="*res://Singletons/DebugDisplay.tscn"
 
 [display]
 
 window/size/width=640
 window/size/height=1024
-window/size/test_width=640
-window/size/test_height=1024
+window/size/test_width=427
+window/size/test_height=683
 window/handheld/orientation="portrait"
 mouse_cursor/custom_image="res://Asserts/UI/cursor_pointer3D.png"
 window/stretch/mode="2d"

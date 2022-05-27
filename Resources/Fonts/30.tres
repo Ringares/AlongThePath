@@ -4,5 +4,5 @@
 font_path = "res://Asserts/Font/Xolonium-Regular.ttf"
 
 [resource]
-size = 18
+size = 24
 font_data = SubResource( 1 )

@@ -1,0 +1,54 @@
+[gd_scene load_steps=4 format=2]
+
+[ext_resource path="res://Scenes/UIScenes/TurnIndicator.gd" type="Script" id=1]
+
+[sub_resource type="DynamicFontData" id=1]
+font_path = "res://Asserts/Font/Xolonium-Regular.ttf"
+
+[sub_resource type="DynamicFont" id=2]
+size = 48
+font_data = SubResource( 1 )
+
+[node name="TurnIndicator" type="ColorRect"]
+rect_min_size = Vector2( 448, 448 )
+color = Color( 0.239216, 0.239216, 0.239216, 0.419608 )
+script = ExtResource( 1 )
+
+[node name="EnemyTureLabel" type="Label" parent="."]
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+margin_left = -180.0
+margin_top = -109.0
+margin_right = 180.0
+margin_bottom = -51.0
+custom_fonts/font = SubResource( 2 )
+text = "Enemy Turn"
+uppercase = true
+
+[node name="PlayerTurnLabel" type="Label" parent="."]
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+margin_left = -187.0
+margin_top = 51.0
+margin_right = 187.0
+margin_bottom = 109.0
+custom_fonts/font = SubResource( 2 )
+text = "Player Turn"
+uppercase = true
+
+[node name="ExtraMoveLabel" type="Label" parent="."]
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+margin_left = -187.0
+margin_top = -29.0
+margin_right = 187.0
+margin_bottom = 29.0
+custom_fonts/font = SubResource( 2 )
+text = "Extra Move"
+uppercase = true

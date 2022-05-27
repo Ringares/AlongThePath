@@ -14,8 +14,8 @@ class Matches:
 	
 	func size():
 		return matches.size()
-			
-	
+
+
 class Match:
 	var index1 = null
 	var index2 = null
@@ -125,7 +125,8 @@ func search_matches(block_list):
 					matches.append(Match.new(b_index, b2_index, cnt))
 				swap_index(b_index, b2_index, block_list)
 	return matches
-			
+
+
 func swap_index(index1, index2, block_list):
 	var t = block_list[index1.x][index1.y]
 	block_list[index1.x][index1.y] = block_list[index2.x][index2.y]

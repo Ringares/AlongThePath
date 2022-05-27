@@ -21,8 +21,10 @@ func load_csv():
 	print(header)
 	print(datas)
 	for d in datas:
-		for i in range(len(header)):
-			CharactorData[header[i]] = d[i]
+		var name = d[0]
+		CharactorData[name] = {}
+		for i in range(1, len(header)):
+			CharactorData[name][header[i]] = d[i]
 
 var CharactorData = {}
  
